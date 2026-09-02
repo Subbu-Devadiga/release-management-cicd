@@ -20,3 +20,18 @@ jobs:
 
       - name: Run automated tests
         run: python -m unittest discover -s tests -v
+
+      - name: Create application package
+        run: |
+          mkdir release-package
+          cp application/app.py release-package/
+          cp application/version.txt release-package/
+          cp README.md release-package/
+          cd release-package
+          zip -r ../release-management-app-v1.0.0.zip .
+
+      - name: Upload application artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-management-app-v1.0.0
+          path: release-management-app-v1.0.0.zip
