@@ -1,4 +1,4 @@
-def get_release_status():
+def get_release_status(
     return "Release Management CI/CD Project is running"
 
 
