@@ -62,3 +62,32 @@ jobs:
         with:
           name: release-management-app-v1.0.0
           path: release-management-app-v1.0.0.zip
+
+
+deploy-dev:
+    needs: package
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Download application artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-management-app-v1.0.0
+          path: deployment-package
+
+      - name: Extract application
+        run: |
+          mkdir dev-environment
+          unzip deployment-package/release-management-app-v1.0.0.zip -d dev-environment
+
+      - name: Deploy application to DEV
+        run: |
+          echo "Deploying application to DEV environment..."
+          cp -r dev-environment/* deployment-package/
+          echo "Deployment completed successfully."
+
+      - name: Verify DEV deployment
+        run: |
+          python deployment-package/app.py
+          echo "DEV deployment verification completed."
