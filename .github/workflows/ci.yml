@@ -64,7 +64,7 @@ jobs:
           path: release-management-app-v1.0.0.zip
 
 
-deploy-dev:
+  deploy-dev:
     needs: package
     runs-on: ubuntu-latest
     environment: development
