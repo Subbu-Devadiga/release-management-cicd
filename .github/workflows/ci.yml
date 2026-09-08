@@ -91,3 +91,29 @@ jobs:
         run: |
           python deployment-package/app.py
           echo "DEV deployment verification completed."
+  deploy-uat:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: uat
+
+    steps:
+      - name: Download application artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-management-app-v1.0.0
+          path: deployment-package
+
+      - name: Extract application
+        run: |
+          mkdir uat-environment
+          unzip deployment-package/release-management-app-v1.0.0.zip -d uat-environment
+
+      - name: Deploy application to UAT
+        run: |
+          echo "Deploying application to UAT environment..."
+          echo "UAT deployment completed successfully."
+
+      - name: Verify UAT deployment
+        run: |
+          python uat-environment/app.py
+          echo "UAT deployment verification completed."
