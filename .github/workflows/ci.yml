@@ -117,3 +117,29 @@ jobs:
         run: |
           python uat-environment/app.py
           echo "UAT deployment verification completed."
+  deploy-production:
+    needs: deploy-uat
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Download application artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-management-app-v1.0.0
+          path: deployment-package
+
+      - name: Extract application
+        run: |
+          mkdir production-environment
+          unzip deployment-package/release-management-app-v1.0.0.zip -d production-environment
+
+      - name: Deploy application to Production
+        run: |
+          echo "Deploying application to PRODUCTION environment..."
+          echo "Production deployment completed successfully."
+
+      - name: Verify Production deployment
+        run: |
+          python production-environment/app.py
+          echo "PRODUCTION deployment verification completed."
