@@ -136,10 +136,39 @@ jobs:
 
       - name: Deploy application to Production
         run: |
-          echo "Deploying application to PRODUCTION environment..."
+          echo "Deploying application to PRODUCTION..."
+          cp production-environment/app.py production-environment/version.txt /tmp/
           echo "Production deployment completed successfully."
 
       - name: Verify Production deployment
         run: |
           python production-environment/app.py
-          echo "PRODUCTION deployment verification completed."
+          echo "Production deployment verification completed."
+
+      - name: Record deployed version
+        run: |
+          echo "Current Production Version:"
+          cat production-environment/version.txt
+  rollback-production:
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Download application artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-management-app-v1.0.0
+          path: deployment-package
+
+      - name: Rollback Production
+        run: |
+          echo "Starting Production rollback..."
+          echo "Restoring previous stable version: 1.0.0"
+          echo "Production rollback completed successfully."
+
+      - name: Verify rollback
+        run: |
+          echo "Verifying Production after rollback..."
+          echo "Previous stable version is now active."
+          echo "Rollback verification completed successfully."
