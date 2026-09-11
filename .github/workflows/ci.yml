@@ -60,6 +60,7 @@ jobs:
           cp application/app.py release-package/
           cp application/version.txt release-package/
           cp README.md release-package/
+	  cp release-metadata.txt release-package/
           cd release-package
           zip -r ../release-management-app-v1.0.0.zip .
 
