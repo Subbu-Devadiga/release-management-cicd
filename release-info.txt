@@ -1,0 +1,3 @@
+Release Version: 1.0.0
+Application: Release Management CI/CD Project
+Release Type: Initial Release

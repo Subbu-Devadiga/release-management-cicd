@@ -47,6 +47,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Create release metadata
+        run: |
+          echo "Release Version: 1.0.0" > release-metadata.txt
+          echo "Git Commit: $GITHUB_SHA" >> release-metadata.txt
+          echo "Git Branch: $GITHUB_REF_NAME" >> release-metadata.txt
+          echo "Release Date: $(date -u)" >> release-metadata.txt
 
       - name: Create application package
         run: |
@@ -133,6 +139,11 @@ jobs:
         run: |
           mkdir production-environment
           unzip deployment-package/release-management-app-v1.0.0.zip -d production-environment
+      - name: Display release information
+        run: |
+          echo "===== RELEASE INFORMATION ====="
+          cat production-environment/release-metadata.txt
+          echo "================================"
 
       - name: Deploy application to Production
         run: |
