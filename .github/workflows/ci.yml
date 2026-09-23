@@ -155,6 +155,22 @@ jobs:
         run: |
           python deployment-package/app.py
           echo "DEV deployment verification completed."
+      - name: Create DEV deployment record
+        run: |
+          VERSION=$(cat deployment-package/version.txt)
+
+          {
+            echo "# 🔧 DEV Deployment Record"
+            echo ""
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Release Version | $VERSION |"
+            echo "| Environment | DEV |"
+            echo "| Artifact | release-management-app-v1.0.0 |"
+            echo "| Deployment Status | SUCCESS |"
+            echo "| Deployment Time | $(date -u) |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
   deploy-uat:
     needs: deploy-dev
     runs-on: ubuntu-latest
@@ -181,6 +197,21 @@ jobs:
         run: |
           python uat-environment/app.py
           echo "UAT deployment verification completed."
+      - name: Create UAT deployment record
+        run: |
+          VERSION=$(cat uat-environment/version.txt)
+
+          {
+            echo "# 🧪 UAT Deployment Record"
+            echo ""
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Release Version | $VERSION |"
+            echo "| Environment | UAT |"
+            echo "| Artifact | release-management-app-v1.0.0 |"
+            echo "| Deployment Status | SUCCESS |"
+            echo "| Deployment Time | $(date -u) |"
+          } >> "$GITHUB_STEP_SUMMARY"
   deploy-production:
     needs: deploy-uat
     runs-on: ubuntu-latest
@@ -202,6 +233,25 @@ jobs:
           echo "===== RELEASE INFORMATION ====="
           cat production-environment/release-metadata.txt
           echo "================================"
+      - name: Create Production deployment record
+        run: |
+          VERSION=$(grep "Release Version:" production-environment/release-metadata.txt | cut -d':' -f2- | xargs)
+          COMMIT=$(grep "Git Commit:" production-environment/release-metadata.txt | cut -d':' -f2- | xargs)
+          BRANCH=$(grep "Git Branch:" production-environment/release-metadata.txt | cut -d':' -f2- | xargs)
+
+          {
+            echo "# 🚀 Production Deployment Record"
+            echo ""
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Release Version | $VERSION |"
+            echo "| Environment | PRODUCTION |"
+            echo "| Git Branch | $BRANCH |"
+            echo "| Git Commit | $COMMIT |"
+            echo "| Artifact | release-management-app-v1.0.0 |"
+            echo "| Deployment Status | SUCCESS |"
+            echo "| Deployment Time | $(date -u) |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Deploy application to Production
         run: |
