@@ -8,7 +8,7 @@ class TestReleaseManagementApp(unittest.TestCase):
         result = get_release_status()
         self.assertEqual(
             result,
-            "This test shoud fail"
+            "Release Management CI/CD Project is running"
         )
 
 
