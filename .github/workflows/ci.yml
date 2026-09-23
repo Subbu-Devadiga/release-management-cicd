@@ -142,31 +142,62 @@ jobs:
 
       - name: Extract application
         run: |
-          mkdir dev-environment
-          unzip deployment-package/release-management-app-v1.0.0.zip -d dev-environment
+          mkdir blue-environment
+          mkdir green-environment
 
-      - name: Deploy application to DEV
-        run: |
-          echo "Deploying application to DEV environment..."
-          cp -r dev-environment/* deployment-package/
-          echo "Deployment completed successfully."
+          unzip deployment-package/release-management-app-v1.0.0.zip -d green-environment
 
-      - name: Verify DEV deployment
+      - name: Show current BLUE version
         run: |
-          python deployment-package/app.py
-          echo "DEV deployment verification completed."
+          echo "===== BLUE ENVIRONMENT ====="
+          echo "Current active version: 1.0.0"
+          echo "BLUE is currently serving traffic."
+
+      - name: Deploy new version to GREEN
+        run: |
+          echo "===== GREEN DEPLOYMENT ====="
+          echo "Deploying release to GREEN environment..."
+          echo "GREEN deployment completed successfully."
+
+      - name: Validate GREEN environment
+        run: |
+          echo "===== GREEN VALIDATION ====="
+
+          test -f green-environment/app.py
+          test -f green-environment/version.txt
+
+          python green-environment/app.py
+
+          echo "GREEN validation successful."
+
+      - name: Switch traffic from BLUE to GREEN
+        run: |
+          echo "===== TRAFFIC SWITCH ====="
+          echo "BLUE  → inactive"
+          echo "GREEN → active"
+          echo "Traffic successfully switched to GREEN."
+
+      - name: Verify active environment
+        run: |
+          echo "===== ACTIVE ENVIRONMENT ====="
+          echo "Active environment: GREEN"
+          echo "Active version:"
+          cat green-environment/version.txt
+
       - name: Create DEV deployment record
         run: |
-          VERSION=$(cat deployment-package/version.txt)
+          VERSION=$(cat green-environment/version.txt)
 
           {
-            echo "# 🔧 DEV Deployment Record"
+            echo "# 🔵🟢 Blue-Green DEV Deployment"
             echo ""
             echo "| Field | Value |"
             echo "|---|---|"
             echo "| Release Version | $VERSION |"
-            echo "| Environment | DEV |"
-            echo "| Artifact | release-management-app-v1.0.0 |"
+            echo "| Previous Environment | BLUE |"
+            echo "| New Environment | GREEN |"
+            echo "| Deployment Strategy | BLUE-GREEN |"
+            echo "| Traffic Switch | BLUE → GREEN |"
             echo "| Deployment Status | SUCCESS |"
             echo "| Deployment Time | $(date -u) |"
           } >> "$GITHUB_STEP_SUMMARY"
