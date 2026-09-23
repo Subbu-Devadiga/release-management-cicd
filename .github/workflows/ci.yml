@@ -60,6 +60,7 @@ jobs:
           cp application/version.txt release-package/
           cp README.md release-package/
           cp release-metadata.txt release-package/
+	  cp change-request.txt release-package/
           cd release-package
           zip -r ../release-management-app-v1.0.0.zip .
 
@@ -233,11 +234,35 @@ jobs:
           echo "===== RELEASE INFORMATION ====="
           cat production-environment/release-metadata.txt
           echo "================================"
+      - name: Validate production change request
+        run: |
+          echo "===== CHANGE REQUEST VALIDATION ====="
+
+          test -f production-environment/change-request.txt
+          echo "✓ Change request file exists"
+
+          grep -q "Change ID: CHG0012345" production-environment/change-request.txt
+          echo "✓ Change ID validated"
+
+          grep -q "Release Version: 1.0.0" production-environment/change-request.txt
+          echo "✓ Release version matches change"
+
+          grep -q "Environment: PRODUCTION" production-environment/change-request.txt
+          echo "✓ Target environment validated"
+
+          grep -q "Status: Approved" production-environment/change-request.txt
+          echo "✓ Change approval status validated"
+
+          echo "===================================="
+          echo "CHANGE REQUEST VALIDATION PASSED"
+          echo "Production deployment is authorized."
+          echo "===================================="
       - name: Create Production deployment record
         run: |
           VERSION=$(grep "Release Version:" production-environment/release-metadata.txt | cut -d':' -f2- | xargs)
           COMMIT=$(grep "Git Commit:" production-environment/release-metadata.txt | cut -d':' -f2- | xargs)
           BRANCH=$(grep "Git Branch:" production-environment/release-metadata.txt | cut -d':' -f2- | xargs)
+	  CHANGE_ID=$(grep "Change ID:" production-environment/change-request.txt | cut -d':' -f2- | xargs)
 
           {
             echo "# 🚀 Production Deployment Record"
@@ -245,6 +270,7 @@ jobs:
             echo "| Field | Value |"
             echo "|---|---|"
             echo "| Release Version | $VERSION |"
+	    echo "| Change Request | $CHANGE_ID |"
             echo "| Environment | PRODUCTION |"
             echo "| Git Branch | $BRANCH |"
             echo "| Git Commit | $COMMIT |"
