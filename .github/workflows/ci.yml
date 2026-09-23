@@ -59,7 +59,7 @@ jobs:
           cp application/version.txt release-package/
           cp README.md release-package/
           cp release-metadata.txt release-package/
-	      cp change-request.txt release-package/
+          cp change-request.txt release-package/
           cd release-package
           zip -r ../release-management-app-v1.0.0.zip .
 
@@ -261,7 +261,7 @@ jobs:
           VERSION=$(grep "Release Version:" production-environment/release-metadata.txt | cut -d':' -f2- | xargs)
           COMMIT=$(grep "Git Commit:" production-environment/release-metadata.txt | cut -d':' -f2- | xargs)
           BRANCH=$(grep "Git Branch:" production-environment/release-metadata.txt | cut -d':' -f2- | xargs)
-	  CHANGE_ID=$(grep "Change ID:" production-environment/change-request.txt | cut -d':' -f2- | xargs)
+          CHANGE_ID=$(grep "Change ID:" production-environment/change-request.txt | cut -d':' -f2- | xargs)
 
           {
             echo "# 🚀 Production Deployment Record"
@@ -269,7 +269,7 @@ jobs:
             echo "| Field | Value |"
             echo "|---|---|"
             echo "| Release Version | $VERSION |"
-	    echo "| Change Request | $CHANGE_ID |"
+            echo "| Change Request | $CHANGE_ID |"
             echo "| Environment | PRODUCTION |"
             echo "| Git Branch | $BRANCH |"
             echo "| Git Commit | $COMMIT |"
