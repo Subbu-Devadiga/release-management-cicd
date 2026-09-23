@@ -69,9 +69,67 @@ jobs:
           name: release-management-app-v1.0.0
           path: release-management-app-v1.0.0.zip
 
+  validate-release:
+    needs: package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download release artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-management-app-v1.0.0
+          path: validation-package
+
+      - name: Extract release artifact
+        run: |
+          mkdir validation-environment
+          unzip validation-package/release-management-app-v1.0.0.zip -d validation-environment
+
+      - name: Validate required release files
+        run: |
+          echo "===== RELEASE VALIDATION ====="
+
+          test -f validation-environment/app.py
+          echo "✓ app.py exists"
+
+          test -f validation-environment/version.txt
+          echo "✓ version.txt exists"
+
+          test -f validation-environment/release-metadata.txt
+          echo "✓ release-metadata.txt exists"
+
+          test -f validation-environment/README.md
+          echo "✓ README.md exists"
+
+      - name: Validate release version
+        run: |
+          VERSION=$(cat validation-environment/version.txt)
+
+          if [ "$VERSION" != "1.0.0" ]; then
+            echo "Release version validation failed."
+            exit 1
+          fi
+
+          echo "✓ Release version validated: $VERSION"
+
+      - name: Validate release metadata
+        run: |
+          grep -q "Release Version: 1.0.0" validation-environment/release-metadata.txt
+          grep -q "Git Commit:" validation-environment/release-metadata.txt
+          grep -q "Git Branch:" validation-environment/release-metadata.txt
+
+          echo "✓ Release metadata validated"
+
+      - name: Release readiness result
+        run: |
+          echo "================================"
+          echo "RELEASE VALIDATION PASSED"
+          echo "Release is ready for DEV deployment."
+          echo "================================"
+
 
   deploy-dev:
-    needs: package
+    needs: validate-release
     runs-on: ubuntu-latest
     environment: development
 
