@@ -52,7 +52,6 @@ jobs:
           echo "Git Commit: $GITHUB_SHA" >> release-metadata.txt
           echo "Git Branch: $GITHUB_REF_NAME" >> release-metadata.txt
           echo "Release Date: $(date -u)" >> release-metadata.txt
-
       - name: Create application package
         run: |
           mkdir release-package
