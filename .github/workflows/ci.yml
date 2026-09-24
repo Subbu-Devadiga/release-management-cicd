@@ -38,8 +38,27 @@ jobs:
 
       - name: Run automated tests
         run: python -m unittest discover -s tests -v
-  package:
+  docker-build-test:
     needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t release-management-app:1.0.0 .
+
+      - name: Run Docker container
+        run: |
+          docker run --name release-test release-management-app:1.0.0
+
+      - name: Verify Docker container output
+        run: |
+          docker logs release-test
+  package:
+    needs: docker-build-test
     runs-on: ubuntu-latest
 
     steps:
