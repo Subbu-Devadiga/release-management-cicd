@@ -188,6 +188,35 @@ jobs:
 
           unzip deployment-package/release-management-app-v1.0.0.zip -d green-environment
 
+      - name: Pull Docker image from GHCR
+        run: |
+          echo "===== DOCKER IMAGE PULL ====="
+          docker pull ghcr.io/subbu-devadiga/release-management-app:1.0.0
+          echo "Docker image pulled successfully."
+
+      - name: Deploy Docker container to DEV
+        run: |
+          echo "===== DOCKER DEV DEPLOYMENT ====="
+
+          docker run \
+            --name release-dev \
+            ghcr.io/subbu-devadiga/release-management-app:1.0.0
+
+          echo "Docker container execution completed."
+
+      - name: Verify Docker DEV deployment
+        run: |
+          echo "===== DOCKER DEV VERIFICATION ====="
+
+          docker logs release-dev
+
+          echo "Docker DEV deployment verified successfully."
+
+      - name: Clean up DEV container
+        run: |
+          docker rm release-dev
+          echo "DEV container cleanup completed."
+
       - name: Show current BLUE version
         run: |
           echo "===== BLUE ENVIRONMENT ====="
@@ -235,6 +264,7 @@ jobs:
             echo "| Field | Value |"
             echo "|---|---|"
             echo "| Release Version | $VERSION |"
+            echo "| Docker Image | ghcr.io/subbu-devadiga/release-management-app:1.0.0 |"
             echo "| Previous Environment | BLUE |"
             echo "| New Environment | GREEN |"
             echo "| Deployment Strategy | BLUE-GREEN |"
