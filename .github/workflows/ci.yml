@@ -70,13 +70,15 @@ jobs:
 
       - name: Tag Docker image for GHCR
         run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           docker tag release-management-app:1.0.0 \
-            ghcr.io/${{ github.repository_owner }}/release-management-app:1.0.0
+            ghcr.io/$OWNER/release-management-app:1.0.0
 
       - name: Push Docker image to GHCR
         run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           docker push \
-            ghcr.io/${{ github.repository_owner }}/release-management-app:1.0.0
+            ghcr.io/$OWNER/release-management-app:1.0.0
   package:
     needs: docker-build-test
     runs-on: ubuntu-latest
