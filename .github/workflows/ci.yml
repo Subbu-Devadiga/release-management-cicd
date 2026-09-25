@@ -332,6 +332,26 @@ jobs:
     environment: production
 
     steps:
+      - name: Pull approved Docker image
+        run: |
+          echo "===== PRODUCTION DOCKER IMAGE VALIDATION ====="
+
+          docker pull ghcr.io/subbu-devadiga/release-management-app:1.0.0
+
+          echo "Docker image pulled successfully."
+
+      - name: Validate approved Docker image
+        run: |
+          echo "===== DOCKER IMAGE VALIDATION ====="
+
+          IMAGE="ghcr.io/subbu-devadiga/release-management-app:1.0.0"
+
+          docker image inspect "$IMAGE" > /dev/null
+
+          echo "✓ Docker image exists"
+          echo "✓ Approved image: $IMAGE"
+          echo "✓ Docker image validation passed."
+
       - name: Download application artifact
         uses: actions/download-artifact@v4
         with:
