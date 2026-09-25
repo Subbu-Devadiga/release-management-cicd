@@ -279,41 +279,53 @@ jobs:
     environment: uat
 
     steps:
-      - name: Download application artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: release-management-app-v1.0.0
-          path: deployment-package
-
-      - name: Extract application
+      - name: Pull Docker image from GHCR
         run: |
-          mkdir uat-environment
-          unzip deployment-package/release-management-app-v1.0.0.zip -d uat-environment
+          echo "===== UAT DOCKER IMAGE PULL ====="
 
-      - name: Deploy application to UAT
-        run: |
-          echo "Deploying application to UAT environment..."
-          echo "UAT deployment completed successfully."
+          docker pull ghcr.io/subbu-devadiga/release-management-app:1.0.0
 
-      - name: Verify UAT deployment
+          echo "Docker image pulled successfully."
+
+      - name: Deploy Docker container to UAT
         run: |
-          python uat-environment/app.py
-          echo "UAT deployment verification completed."
+          echo "===== DOCKER UAT DEPLOYMENT ====="
+
+          docker run \
+            --name release-uat \
+            ghcr.io/subbu-devadiga/release-management-app:1.0.0
+
+          echo "Docker container execution completed."
+
+      - name: Verify Docker UAT deployment
+        run: |
+          echo "===== DOCKER UAT VERIFICATION ====="
+
+          docker logs release-uat
+
+          echo "Docker UAT deployment verified successfully."
+
+      - name: Clean up UAT container
+        run: |
+          docker rm release-uat
+
+          echo "UAT container cleanup completed."
+
       - name: Create UAT deployment record
         run: |
-          VERSION=$(cat uat-environment/version.txt)
-
           {
-            echo "# 🧪 UAT Deployment Record"
+            echo "# 🧪 UAT Docker Deployment Record"
             echo ""
             echo "| Field | Value |"
             echo "|---|---|"
-            echo "| Release Version | $VERSION |"
+            echo "| Release Version | 1.0.0 |"
+            echo "| Docker Image | ghcr.io/subbu-devadiga/release-management-app:1.0.0 |"
             echo "| Environment | UAT |"
-            echo "| Artifact | release-management-app-v1.0.0 |"
+            echo "| Deployment Strategy | Docker Container |"
             echo "| Deployment Status | SUCCESS |"
             echo "| Deployment Time | $(date -u) |"
           } >> "$GITHUB_STEP_SUMMARY"
+
   deploy-production:
     needs: deploy-uat
     runs-on: ubuntu-latest
