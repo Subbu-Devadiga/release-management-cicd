@@ -200,6 +200,7 @@ jobs:
 
           docker run \
             --name release-dev \
+            -e APP_ENV=DEV \
             ghcr.io/subbu-devadiga/release-management-app:1.1.0
 
           echo "Docker container execution completed."
@@ -293,6 +294,7 @@ jobs:
 
           docker run \
             --name release-uat \
+            -e APP_ENV=UAT \
             ghcr.io/subbu-devadiga/release-management-app:1.1.0
 
           echo "Docker container execution completed."
@@ -351,6 +353,18 @@ jobs:
           echo "✓ Docker image exists"
           echo "✓ Approved image: $IMAGE"
           echo "✓ Docker image validation passed."
+
+      - name: Deploy Docker container to PROD
+        run: |
+          echo "===== DOCKER PROD DEPLOYMENT ====="
+
+          docker run \
+            --name release-prod \
+            -e APP_ENV=PROD \
+            ghcr.io/subbu-devadiga/release-management-app:1.1.0
+
+          echo "Docker container execution completed."
+
 
       - name: Download application artifact
         uses: actions/download-artifact@v4
