@@ -52,11 +52,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t release-management-app:1.0.0 .
+          docker build -t release-management-app:1.1.0 .
 
       - name: Run Docker container
         run: |
-          docker run --name release-test release-management-app:1.0.0
+          docker run --name release-test release-management-app:1.1.0
 
       - name: Verify Docker container output
         run: |
@@ -71,14 +71,14 @@ jobs:
       - name: Tag Docker image for GHCR
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          docker tag release-management-app:1.0.0 \
-            ghcr.io/$OWNER/release-management-app:1.0.0
+          docker tag release-management-app:1.1.0 \
+            ghcr.io/$OWNER/release-management-app:1.1.0
 
       - name: Push Docker image to GHCR
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           docker push \
-            ghcr.io/$OWNER/release-management-app:1.0.0
+            ghcr.io/$OWNER/release-management-app:1.1.0
   package:
     needs: docker-build-test
     runs-on: ubuntu-latest
@@ -89,7 +89,7 @@ jobs:
 
       - name: Create release metadata
         run: |
-          echo "Release Version: 1.0.0" > release-metadata.txt
+          echo "Release Version: 1.1.0" > release-metadata.txt
           echo "Git Commit: $GITHUB_SHA" >> release-metadata.txt
           echo "Git Branch: $GITHUB_REF_NAME" >> release-metadata.txt
           echo "Release Date: $(date -u)" >> release-metadata.txt
@@ -102,13 +102,13 @@ jobs:
           cp release-metadata.txt release-package/
           cp change-request.txt release-package/
           cd release-package
-          zip -r ../release-management-app-v1.0.0.zip .
+          zip -r ../release-management-app-v1.1.0.zip .
 
       - name: Upload application artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-management-app-v1.0.0
-          path: release-management-app-v1.0.0.zip
+          name: release-management-app-v1.1.0
+          path: release-management-app-v1.1.0.zip
 
   validate-release:
     needs: package
@@ -118,13 +118,13 @@ jobs:
       - name: Download release artifact
         uses: actions/download-artifact@v4
         with:
-          name: release-management-app-v1.0.0
+          name: release-management-app-v1.1.0
           path: validation-package
 
       - name: Extract release artifact
         run: |
           mkdir validation-environment
-          unzip validation-package/release-management-app-v1.0.0.zip -d validation-environment
+          unzip validation-package/release-management-app-v1.1.0.zip -d validation-environment
 
       - name: Validate required release files
         run: |
@@ -146,7 +146,7 @@ jobs:
         run: |
           VERSION=$(cat validation-environment/version.txt)
 
-          if [ "$VERSION" != "1.0.0" ]; then
+          if [ "$VERSION" != "1.1.0" ]; then
             echo "Release version validation failed."
             exit 1
           fi
@@ -155,7 +155,7 @@ jobs:
 
       - name: Validate release metadata
         run: |
-          grep -q "Release Version: 1.0.0" validation-environment/release-metadata.txt
+          grep -q "Release Version: 1.1.0" validation-environment/release-metadata.txt
           grep -q "Git Commit:" validation-environment/release-metadata.txt
           grep -q "Git Branch:" validation-environment/release-metadata.txt
 
@@ -178,7 +178,7 @@ jobs:
       - name: Download application artifact
         uses: actions/download-artifact@v4
         with:
-          name: release-management-app-v1.0.0
+          name: release-management-app-v1.1.0
           path: deployment-package
 
       - name: Extract application
@@ -186,12 +186,12 @@ jobs:
           mkdir blue-environment
           mkdir green-environment
 
-          unzip deployment-package/release-management-app-v1.0.0.zip -d green-environment
+          unzip deployment-package/release-management-app-v1.1.0.zip -d green-environment
 
       - name: Pull Docker image from GHCR
         run: |
           echo "===== DOCKER IMAGE PULL ====="
-          docker pull ghcr.io/subbu-devadiga/release-management-app:1.0.0
+          docker pull ghcr.io/subbu-devadiga/release-management-app:1.1.0
           echo "Docker image pulled successfully."
 
       - name: Deploy Docker container to DEV
@@ -200,7 +200,7 @@ jobs:
 
           docker run \
             --name release-dev \
-            ghcr.io/subbu-devadiga/release-management-app:1.0.0
+            ghcr.io/subbu-devadiga/release-management-app:1.1.0
 
           echo "Docker container execution completed."
 
@@ -264,7 +264,7 @@ jobs:
             echo "| Field | Value |"
             echo "|---|---|"
             echo "| Release Version | $VERSION |"
-            echo "| Docker Image | ghcr.io/subbu-devadiga/release-management-app:1.0.0 |"
+            echo "| Docker Image | ghcr.io/subbu-devadiga/release-management-app:1.1.0 |"
             echo "| Previous Environment | BLUE |"
             echo "| New Environment | GREEN |"
             echo "| Deployment Strategy | BLUE-GREEN |"
@@ -283,7 +283,7 @@ jobs:
         run: |
           echo "===== UAT DOCKER IMAGE PULL ====="
 
-          docker pull ghcr.io/subbu-devadiga/release-management-app:1.0.0
+          docker pull ghcr.io/subbu-devadiga/release-management-app:1.1.0
 
           echo "Docker image pulled successfully."
 
@@ -293,7 +293,7 @@ jobs:
 
           docker run \
             --name release-uat \
-            ghcr.io/subbu-devadiga/release-management-app:1.0.0
+            ghcr.io/subbu-devadiga/release-management-app:1.1.0
 
           echo "Docker container execution completed."
 
@@ -318,8 +318,8 @@ jobs:
             echo ""
             echo "| Field | Value |"
             echo "|---|---|"
-            echo "| Release Version | 1.0.0 |"
-            echo "| Docker Image | ghcr.io/subbu-devadiga/release-management-app:1.0.0 |"
+            echo "| Release Version | 1.1.0 |"
+            echo "| Docker Image | ghcr.io/subbu-devadiga/release-management-app:1.1.0 |"
             echo "| Environment | UAT |"
             echo "| Deployment Strategy | Docker Container |"
             echo "| Deployment Status | SUCCESS |"
@@ -336,7 +336,7 @@ jobs:
         run: |
           echo "===== PRODUCTION DOCKER IMAGE VALIDATION ====="
 
-          docker pull ghcr.io/subbu-devadiga/release-management-app:1.0.0
+          docker pull ghcr.io/subbu-devadiga/release-management-app:1.1.0
 
           echo "Docker image pulled successfully."
 
@@ -344,7 +344,7 @@ jobs:
         run: |
           echo "===== DOCKER IMAGE VALIDATION ====="
 
-          IMAGE="ghcr.io/subbu-devadiga/release-management-app:1.0.0"
+          IMAGE="ghcr.io/subbu-devadiga/release-management-app:1.1.0"
 
           docker image inspect "$IMAGE" > /dev/null
 
@@ -355,13 +355,13 @@ jobs:
       - name: Download application artifact
         uses: actions/download-artifact@v4
         with:
-          name: release-management-app-v1.0.0
+          name: release-management-app-v1.1.0
           path: deployment-package
 
       - name: Extract application
         run: |
           mkdir production-environment
-          unzip deployment-package/release-management-app-v1.0.0.zip -d production-environment
+          unzip deployment-package/release-management-app-v1.1.0.zip -d production-environment
       - name: Display release information
         run: |
           echo "===== RELEASE INFORMATION ====="
@@ -377,7 +377,7 @@ jobs:
           grep -q "Change ID: CHG0012345" production-environment/change-request.txt
           echo "✓ Change ID validated"
 
-          grep -q "Release Version: 1.0.0" production-environment/change-request.txt
+          grep -q "Release Version: 1.1.0" production-environment/change-request.txt
           echo "✓ Release version matches change"
 
           grep -q "Environment: PRODUCTION" production-environment/change-request.txt
@@ -407,7 +407,7 @@ jobs:
             echo "| Environment | PRODUCTION |"
             echo "| Git Branch | $BRANCH |"
             echo "| Git Commit | $COMMIT |"
-            echo "| Artifact | release-management-app-v1.0.0 |"
+            echo "| Artifact | release-management-app-v1.1.0 |"
             echo "| Deployment Status | SUCCESS |"
             echo "| Deployment Time | $(date -u) |"
           } >> "$GITHUB_STEP_SUMMARY"
@@ -436,7 +436,7 @@ jobs:
       - name: Download application artifact
         uses: actions/download-artifact@v4
         with:
-          name: release-management-app-v1.0.0
+          name: release-management-app-v1.1.0
           path: deployment-package
 
       - name: Rollback Production

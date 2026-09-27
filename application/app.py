@@ -1,5 +1,10 @@
+import os
+
+
 def get_release_status():
-    return "Release Management CI/CD Project is running"
+    environment = os.getenv("APP_ENV", "LOCAL")
+
+    return f"Release Management CI/CD Project is running - Environment: {environment}"
 
 
 if __name__ == "__main__":
