@@ -334,6 +334,19 @@ jobs:
     environment: production
 
     steps:
+      - name: Validate deployment secret
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_APPROVAL_TOKEN }}
+        run: |
+          echo "===== SECRET VALIDATION ====="
+
+          if [ -z "$RELEASE_TOKEN" ]; then
+            echo "Deployment secret is missing."
+            exit 1
+          fi
+
+          echo "✓ Deployment secret is available"
+          echo "✓ Secret value is not displayed"
       - name: Pull approved Docker image
         run: |
           echo "===== PRODUCTION DOCKER IMAGE VALIDATION ====="
