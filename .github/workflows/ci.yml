@@ -378,6 +378,21 @@ jobs:
 
           echo "Docker container execution completed."
 
+      - name: Post-deployment health check
+        run: |
+          echo "===== PRODUCTION HEALTH CHECK ====="
+
+          HEALTH_OUTPUT=$(docker run --rm \
+            -e APP_ENV=PROD \
+            ghcr.io/subbu-devadiga/release-management-app:1.1.0)
+
+          echo "$HEALTH_OUTPUT"
+
+          echo "$HEALTH_OUTPUT" | grep -q "Environment: PROD"
+
+          echo "✓ Application started successfully"
+          echo "✓ Production environment validated"
+          echo "✓ Post-deployment health check PASSED"
 
       - name: Download application artifact
         uses: actions/download-artifact@v4
