@@ -388,7 +388,7 @@ jobs:
 
           echo "$HEALTH_OUTPUT"
 
-          echo "$HEALTH_OUTPUT" | grep -q "Environment: INVALID"
+          echo "$HEALTH_OUTPUT" | grep -q "Environment: PROD"
 
           echo "✓ Application started successfully"
           echo "✓ Production environment validated"
