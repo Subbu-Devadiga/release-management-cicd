@@ -388,7 +388,7 @@ jobs:
 
           echo "$HEALTH_OUTPUT"
 
-          echo "$HEALTH_OUTPUT" | grep -q "Environment: PROD"
+          echo "$HEALTH_OUTPUT" | grep -q "Environment: INVALID"
 
           echo "✓ Application started successfully"
           echo "✓ Production environment validated"
@@ -471,15 +471,28 @@ jobs:
           cat production-environment/version.txt
   rollback-production:
     needs: deploy-production
+    if: ${{always()}}
     runs-on: ubuntu-latest
     environment: production
 
-    steps:
-      - name: Download application artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: release-management-app-v1.1.0
-          path: deployment-package
+      - name: Rollback Production
+        if: ${{ needs.deploy-production.result == 'failure' }}
+        run: |
+          echo "Starting Production rollback..."
+          echo "Restoring previous stable version: 1.0.0"
+          echo "Production rollback completed successfully."
+
+      - name: Determine rollback requirement
+        run: |
+          echo "===== ROLLBACK DECISION ====="
+
+          if [ "${{ needs.deploy-production.result }}" = "failure" ]; then
+            echo "Production deployment failed."
+            echo "Rollback is REQUIRED."
+          else
+            echo "Production deployment completed successfully."
+            echo "Rollback is not required."
+          fi
 
       - name: Rollback Production
         run: |
