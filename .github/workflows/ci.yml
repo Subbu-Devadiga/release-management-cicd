@@ -471,7 +471,7 @@ jobs:
           cat production-environment/version.txt
   rollback-production:
     needs: deploy-production
-    if: ${{always()}}
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     environment: production
 
@@ -481,7 +481,6 @@ jobs:
           echo "Starting Production rollback..."
           echo "Restoring previous stable version: 1.0.0"
           echo "Production rollback completed successfully."
-
       - name: Determine rollback requirement
         run: |
           echo "===== ROLLBACK DECISION ====="
@@ -492,7 +491,6 @@ jobs:
           else
             echo "Production deployment completed successfully."
             echo "Rollback is not required."
-          fi
 
       - name: Rollback Production
         run: |
