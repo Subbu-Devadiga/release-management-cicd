@@ -469,7 +469,7 @@ jobs:
         run: |
           echo "Current Production Version:"
           cat production-environment/version.txt
-   rollback-production:
+  rollback-production:
     needs: deploy-production
     if: ${{ always() }}
     runs-on: ubuntu-latest
