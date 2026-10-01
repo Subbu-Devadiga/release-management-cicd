@@ -99,6 +99,7 @@ jobs:
           cp application/app.py release-package/
           cp application/version.txt release-package/
           cp README.md release-package/
+          cp RELEASE_NOTES.md release-package/
           cp release-metadata.txt release-package/
           cp change-request.txt release-package/
           cd release-package
