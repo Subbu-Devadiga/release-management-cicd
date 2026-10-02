@@ -455,6 +455,8 @@ jobs:
             echo "| Git Branch | $BRANCH |"
             echo "| Git Commit | $COMMIT |"
             echo "| Artifact | release-management-app-v1.1.0 |"
+            echo "| Docker Image | ghcr.io/subbu-devadiga/release-management-app:1.1.0 |"
+            echo "| Rollback Version | 1.0.0 |"
             echo "|Release Approval | Approved |"
             echo "|UAT Approval | Approved |"
             echo "|Production Approval | GitHub Environment Approval Passed |"
