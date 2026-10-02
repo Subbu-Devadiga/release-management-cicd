@@ -358,7 +358,7 @@ jobs:
           IMAGE="ghcr.io/subbu-devadiga/release-management-app:1.1.0"
           IMAGE_DIGEST=$(docker image inspect "$IMAGE" --format '{{index .RepoDigests 0}}')
           echo "Docker image digest: $IMAGE_DIGEST"
-
+          echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> "$GITHUB_ENV"
           echo "Docker image pulled successfully."
 
       - name: Validate approved Docker image
@@ -459,6 +459,7 @@ jobs:
             echo "| Git Commit | $COMMIT |"
             echo "| Artifact | release-management-app-v1.1.0 |"
             echo "| Docker Image | ghcr.io/subbu-devadiga/release-management-app:1.1.0 |"
+            echo "| Docker Image Digest | $IMAGE_DIGEST |"
             echo "| Rollback Version | 1.0.0 |"
             echo "|Release Approval | Approved |"
             echo "|UAT Approval | Approved |"
