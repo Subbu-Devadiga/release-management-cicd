@@ -429,7 +429,9 @@ jobs:
           echo "✓ Target environment validated"
 
           grep -q "Status: Approved" production-environment/change-request.txt
-          echo "✓ Change approval status validated"
+          echo "✓ Change approval status Approved"
+
+          echo "✓ Production change validation PASSED"
 
           echo "===================================="
           echo "CHANGE REQUEST VALIDATION PASSED"
