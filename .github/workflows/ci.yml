@@ -355,6 +355,9 @@ jobs:
           echo "===== PRODUCTION DOCKER IMAGE VALIDATION ====="
 
           docker pull ghcr.io/subbu-devadiga/release-management-app:1.1.0
+          IMAGE="ghcr.io/subbu-devadiga/release-management-app:1.1.0"
+          IMAGE_DIGEST=$(docker image inspect "$IMAGE" --format '{{index .RepoDigests 0}}')
+          echo "Docker image digest: $IMAGE_DIGEST"
 
           echo "Docker image pulled successfully."
 
