@@ -447,6 +447,27 @@ jobs:
           BRANCH=$(grep "Git Branch:" production-environment/release-metadata.txt | cut -d':' -f2- | xargs)
           CHANGE_ID=$(grep "Change ID:" production-environment/change-request.txt | cut -d':' -f2- | xargs)
 
+          cat > deployment-audit.md <<EOF
+          # 🚀 Production Deployment Record
+
+          | Field | Value |
+          |---|---|
+          | Release Version | $VERSION |
+          | Change Request | $CHANGE_ID |
+          | Environment | PRODUCTION |
+          | Git Branch | $BRANCH |
+          | Git Commit | $COMMIT |
+          | Artifact | release-management-app-v1.1.0 |
+          | Docker Image | ghcr.io/subbu-devadiga/release-management-app:1.1.0 |
+          | Docker Image Digest | $IMAGE_DIGEST |
+          | Immutable Image Reference | $IMAGE_DIGEST |
+          | Rollback Version | 1.0.0 |
+          | Release Approval | Approved |
+          | UAT Approval | Approved |
+          | Production Approval | GitHub Environment Approval Passed |
+          | Deployment Status | SUCCESS |
+          | Deployment Time | $(date -u) |
+          EOF
           {
             echo "# 🚀 Production Deployment Record"
             echo ""
@@ -468,6 +489,12 @@ jobs:
             echo "| Deployment Status | SUCCESS |"
             echo "| Deployment Time | $(date -u) |"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload deployment audit record
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deployment-audit
+          path: deployment-audit.md
 
       - name: Deploy application to Production
         run: |
