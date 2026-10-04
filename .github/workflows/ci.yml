@@ -440,6 +440,22 @@ jobs:
           echo "CHANGE REQUEST VALIDATION PASSED"
           echo "Production deployment is authorized."
           echo "===================================="
+
+      - name: Deploy application to Production
+        run: |
+          echo "Deploying application to PRODUCTION..."
+          cp production-environment/app.py production-environment/version.txt /tmp/
+          echo "Production deployment completed successfully."
+
+      - name: Verify Production deployment
+        run: |
+          python production-environment/app.py
+          echo "Production deployment verification completed."
+
+      - name: Record deployed version
+        run: |
+          echo "Current Production Version:"
+          cat production-environment/version.txt
       - name: Create Production deployment record
         run: |
           VERSION=$(grep "Release Version:" production-environment/release-metadata.txt | cut -d':' -f2- | xargs)
@@ -496,21 +512,6 @@ jobs:
           name: production-deployment-audit
           path: deployment-audit.md
 
-      - name: Deploy application to Production
-        run: |
-          echo "Deploying application to PRODUCTION..."
-          cp production-environment/app.py production-environment/version.txt /tmp/
-          echo "Production deployment completed successfully."
-
-      - name: Verify Production deployment
-        run: |
-          python production-environment/app.py
-          echo "Production deployment verification completed."
-
-      - name: Record deployed version
-        run: |
-          echo "Current Production Version:"
-          cat production-environment/version.txt
   rollback-production:
     needs: deploy-production
     if: ${{ always() }}
