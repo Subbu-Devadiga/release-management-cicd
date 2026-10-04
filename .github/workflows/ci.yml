@@ -81,8 +81,28 @@ jobs:
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           docker push \
             ghcr.io/$OWNER/release-management-app:1.1.0
-  package:
+
+  security-scan:
     needs: docker-build-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image for security scan
+        run: |
+          docker build -t release-management-app:security-scan .
+
+      - name: Scan Docker image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'release-management-app:security-scan'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+  package:
+    needs: security-scan
     runs-on: ubuntu-latest
 
     steps:
