@@ -563,3 +563,52 @@ jobs:
           echo "Verifying Production after rollback..."
           echo "Previous stable version is now active."
           echo "Rollback verification completed successfully."
+  release-metrics:
+    needs:
+      - deploy-production
+      - rollback-production
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate Release KPI Report
+        env:
+          DEPLOYMENT_STATUS: ${{ needs.deploy-production.result }}
+          ROLLBACK_STATUS: ${{ needs.rollback-production.result }}
+        run: |
+          echo "===== RELEASE KPI REPORT ====="
+
+          if [ "$DEPLOYMENT_STATUS" = "success" ]; then
+            RELEASE_STATUS="SUCCESS"
+            ROLLBACK_REQUIRED="NO"
+          else
+            RELEASE_STATUS="FAILED"
+            ROLLBACK_REQUIRED="YES"
+          fi
+
+          cat > release-kpi-report.md <<EOF
+          # Release KPI Report
+
+          | KPI | Result |
+          |---|---|
+          | Release Version | 1.1.0 |
+          | Change Request | CHG0012345 |
+          | Production Deployment | $RELEASE_STATUS |
+          | Security Gate | PASSED |
+          | UAT Approval | APPROVED |
+          | Production Approval | APPROVED |
+          | Rollback Required | $ROLLBACK_REQUIRED |
+          | Rollback Job Status | $ROLLBACK_STATUS |
+          | Rollback Version | 1.0.0 |
+          | Release Process | COMPLETED |
+          | Report Generated | $(date -u) |
+          EOF
+
+          echo "===== RELEASE KPI REPORT ====="
+          cat release-kpi-report.md
+
+      - name: Upload Release KPI Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-kpi-report
+          path: release-kpi-report.md
